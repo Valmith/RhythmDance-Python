@@ -1,6 +1,9 @@
 import pgzrun
+import os
 from random import randint
 
+#Centers the window 
+os.environ['SDL_VIDEO_CENTERED'] = '1'
 WIDTH = 800
 HEIGHT = 600
 CENTER_X = WIDTH / 2
@@ -19,6 +22,7 @@ show_countdown = True
 moves_complete = False
 game_over = False
 
+#draws the pictures to the window
 dancer = Actor("dancer-start.png")
 dancer.pos = CENTER_X + 5, CENTER_Y - 40
 
@@ -51,7 +55,7 @@ def draw():
         if show_countdown:
             screen.draw.text(str(count), color="black", topleft=(CENTER_X - 8, 150), fontsize=60)
 
-    if game_over:
+    else:
         screen.clear()
         screen.blit("stage", (0, 0))
         screen.draw.text("Score: " + str(score), color="black", topleft=(10, 10))
@@ -65,6 +69,7 @@ def reset_dancer():
         right.image = "right.png"
         down.image = "down.png"
         left.image = "left.png"
+    return
 
 def update_dancer(move):
     global game_over
@@ -85,6 +90,8 @@ def update_dancer(move):
             left.image = "left-lit.png"
             dancer.image = "dancer-left.png"
             clock.schedule(reset_dancer, 0.5)
+
+    return
 
 def display_moves():
     global move_list, display_list, dance_length
@@ -109,14 +116,27 @@ def display_moves():
     else:
         say_dance = True
         show_countdown = False
+    return
 
-def generate_moves(): # to update
+#just the timer
+def countdown():
+    global count, game_over, show_countdown
+
+    if count > 1:
+        count = count - 1
+        clock.schedule(countdown, 1)
+    else:
+        show_countdown = False
+        display_moves()
+    return
+
+
+def generate_moves(): # updated
     global move_list, dance_length, count
     global show_countdown, say_dance
 
     count = 4
     move_list = []
-    display_list = []
     say_dance = False
 
     for move in range(0, dance_length):
@@ -127,27 +147,51 @@ def generate_moves(): # to update
     show_countdown = True
     countdown()
 
-def countdown():
-    global count, game_over, show_countdown
-
-    if count > 1:
-        count = count - 1
-        clock.schedule(countdown, 1)
+def next_move():
+    global dance_length, current_move, moves_complete
+    if current_move < dance_length - 1:
+        current_move = current_move + 1
     else:
-        show_countdown = False
-        display_moves()
+        moves_complete = True
+    return
 
+#KEY PRESSES to see if right or wrong move
 def on_key_up(key):
     global score, game_over, move_list, current_move
 
     if key == keys.UP:
         update_dancer(0)
+        if move_list[current_move] == 0:
+            score = score + 1
+            next_move()
+        else:
+            game_over = True
+
     elif key == keys.RIGHT:
         update_dancer(1)
+        if move_list[current_move] == 1:
+            score = score + 1
+            next_move()
+        else:
+            game_over = True
+
     elif key == keys.DOWN:
         update_dancer(2)
+        if move_list[current_move] == 2:
+            score = score + 1
+            next_move()
+        else:
+            game_over = True
+
     elif key == keys.LEFT:
         update_dancer(3)
+        if move_list[current_move] == 3:
+            score = score + 1
+            next_move()
+        else:
+            game_over = True
+
+    return
 
 generate_moves()
 music.play("vanishing-horizon")
