@@ -2,7 +2,7 @@ import pgzrun
 import os
 from random import randint
 
-#Centers the window 
+#Centers the window and sets the window size
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 WIDTH = 800
 HEIGHT = 600
@@ -131,7 +131,7 @@ def countdown():
     return
 
 
-def generate_moves(): # updated
+def generate_moves(): # updated hehe finally
     global move_list, dance_length, count
     global show_countdown, say_dance
 
